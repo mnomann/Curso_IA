@@ -1,0 +1,6 @@
+node_modules/
+dist/
+*.log
+.DS_Store
+# Banco de sonidos para regenerar el audio (32 MB): se descarga aparte, no va al repositorio
+*.sf2

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Relojero Sin Hora</title>
+<meta name="description" content="Minijuego souls-like de vista superior: aprende el compás del guardián de una torre cuyo reloj se detuvo.">
+<meta name="theme-color" content="#16120e">
+<link rel="stylesheet" href="/src/estilos.css">
+</head>
+<body>
+<!-- Aguja de reloj reutilizable: es el selector de las opciones y el subrayado del título -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <linearGradient id="laton" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#f1d896"/>
+      <stop offset="0.5" stop-color="#b8913f"/>
+      <stop offset="1" stop-color="#6e5222"/>
+    </linearGradient>
+    <symbol id="aguja" viewBox="0 0 120 16">
+      <circle cx="8" cy="8" r="6.5" fill="url(#laton)" stroke="#2a1d0c" stroke-width="1.2"/>
+      <circle cx="8" cy="8" r="2" fill="#2a1d0c"/>
+      <path d="M13 6.4 L92 7.1 L92 8.9 L13 9.6 Z" fill="url(#laton)" stroke="#2a1d0c" stroke-width="0.8"/>
+      <path d="M92 6.2 L118 8 L92 9.8 Z" fill="#c8402f" stroke="#4a120b" stroke-width="0.8"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div id="contenedor">
+  <div id="marco">
+    <canvas id="lienzo"></canvas>
+
+    <section id="pantalla-menu" class="pantalla menu visible primera-vez" aria-labelledby="titulo-juego">
+      <div class="columna">
+        <h1 id="titulo-juego" class="titulo">
+          <span class="titulo-linea">El Relojero</span>
+          <span class="titulo-linea">Sin Hora</span>
+        </h1>
+        <svg class="aguja-titulo" viewBox="0 0 120 16" aria-hidden="true"><use href="#aguja"/></svg>
+        <p class="lema" id="lema-jefe"></p>
+        <nav class="opciones" aria-label="Menú principal">
+          <button class="opcion" id="btn-comenzar">Enfrentar al Relojero</button>
+          <button class="opcion" id="btn-menu-opciones">Opciones</button>
+        </nav>
+      </div>
+      <dl class="controles" aria-label="Controles">
+        <div><dt><kbd>W</kbd><kbd>A</kbd><kbd>S</kbd><kbd>D</kbd></dt><dd>moverse</dd></div>
+        <div><dt><kbd>J</kbd></dt><dd>atacar</dd></div>
+        <div><dt><kbd>Espacio</kbd></dt><dd>rodar</dd></div>
+        <div><dt><kbd>E</kbd></dt><dd>curarse</dd></div>
+        <div><dt><kbd>Esc</kbd></dt><dd>pausa</dd></div>
+      </dl>
+    </section>
+
+    <section id="pantalla-opciones" class="pantalla menu" aria-labelledby="titulo-opciones">
+      <div class="columna">
+        <h2 id="titulo-opciones" class="encabezado">Opciones</h2>
+        <div class="volumenes">
+          <label class="control-volumen" for="vol-musica">
+            <span class="etiqueta-vol">Música</span>
+            <input type="range" id="vol-musica" min="0" max="100" step="1">
+            <output id="vol-musica-valor" for="vol-musica">0%</output>
+          </label>
+          <label class="control-volumen" for="vol-efectos">
+            <span class="etiqueta-vol">Efectos</span>
+            <input type="range" id="vol-efectos" min="0" max="100" step="1">
+            <output id="vol-efectos-valor" for="vol-efectos">0%</output>
+          </label>
+        </div>
+        <p class="nota">El volumen se guarda en este navegador.</p>
+        <nav class="opciones" aria-label="Opciones">
+          <button class="opcion" id="btn-opciones-volver">Volver</button>
+        </nav>
+      </div>
+    </section>
+
+    <section id="pantalla-pausa" class="pantalla menu sobre-pelea" aria-labelledby="titulo-pausa">
+      <div class="columna">
+        <h2 id="titulo-pausa" class="encabezado">Pausa</h2>
+        <nav class="opciones" aria-label="Pausa">
+          <button class="opcion" id="btn-continuar">Continuar</button>
+          <button class="opcion" id="btn-pausa-opciones">Opciones</button>
+          <button class="opcion" id="btn-pausa-menu">Volver al menú</button>
+        </nav>
+      </div>
+    </section>
+
+    <section id="pantalla-muerte" class="pantalla evento muerte" aria-labelledby="titulo-muerte">
+      <div class="franja">
+        <h2 id="titulo-muerte" class="titulo-evento">Has muerto</h2>
+      </div>
+      <nav class="opciones" aria-label="Después de morir">
+        <button class="opcion" id="btn-reintentar">Reintentar</button>
+        <button class="opcion" id="btn-muerte-menu">Volver al menú</button>
+      </nav>
+    </section>
+
+    <section id="pantalla-victoria" class="pantalla evento victoria" aria-labelledby="titulo-victoria">
+      <div class="franja">
+        <h2 id="titulo-victoria" class="titulo-evento">El Relojero ha caído</h2>
+        <dl class="resumen">
+          <div><dt>Tiempo</dt><dd id="stat-tiempo">0:00</dd></div>
+          <div><dt>Curaciones usadas</dt><dd id="stat-curas">0 de 3</dd></div>
+        </dl>
+      </div>
+      <nav class="opciones" aria-label="Después de vencer">
+        <button class="opcion" id="btn-revancha">Pelear otra vez</button>
+        <button class="opcion" id="btn-victoria-menu">Volver al menú</button>
+      </nav>
+    </section>
+  </div>
+</div>
+
+<!-- Si se abre con doble clic (file://) no hay servidor y nada carga: se explica cómo abrirlo. -->
+<script>
+  if (location.protocol === 'file:') {
+    document.body.innerHTML =
+      '<div style="font:16px/1.6 Georgia,serif;color:#ece0c2;background:#16120e;min-height:100vh;' +
+      'display:flex;align-items:center;justify-content:center;padding:24px;text-align:center">' +
+      '<div><h2 style="color:#e6c77f;margin-bottom:12px">Falta un servidor</h2>' +
+      'Este juego no se abre con doble clic. En la carpeta del proyecto ejecuta ' +
+      '<code>npm install</code> y luego <code>npm run dev</code>, y abre la dirección que aparece.<br>' +
+      'En Vercel funciona directamente.</div></div>';
+  }
+</script>
+<script type="module" src="/src/main.ts"></script>
+</body>
+</html>

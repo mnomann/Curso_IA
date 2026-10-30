@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Probar sonidos</title>
+<style>
+  :root { --fondo: #0b0d12; --panel: #151923; --borde: #2a3142; --texto: #ece8dc; --tenue: #8b91a1; --acento: #f2c14e; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--fondo); color: var(--texto); font-family: system-ui, sans-serif; padding: 24px 16px; }
+  main { max-width: 760px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; }
+  h1 { font-size: 24px; }
+  p { color: var(--tenue); font-size: 14px; line-height: 1.5; }
+  h2 { font-size: 15px; color: var(--acento); margin-top: 10px; }
+  .fila { display: flex; align-items: center; gap: 12px; padding: 10px 12px; background: var(--panel); border: 1px solid var(--borde); border-radius: 8px; }
+  .fila button { flex: none; width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--borde); background: #1d2230; color: var(--texto); font-size: 16px; cursor: pointer; }
+  .fila button:hover, .fila button:focus-visible { border-color: var(--acento); outline: none; }
+  .fila .info { flex: 1; min-width: 0; }
+  .fila .clave { font-family: ui-monospace, monospace; font-size: 13px; }
+  .fila .cuando { color: var(--tenue); font-size: 13px; }
+  .falta { opacity: 0.4; }
+  #todos { align-self: flex-start; padding: 10px 18px; border-radius: 8px; border: 2px solid var(--borde); background: var(--panel); color: var(--texto); font: inherit; font-weight: 600; cursor: pointer; }
+  #todos:hover { border-color: var(--acento); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Probar sonidos</h1>
+  <p>Herramienta de desarrollo (no se publica en Vercel). Con <code>npm run dev</code> corriendo, ábrela en
+  <code>/herramientas/probar-sonidos.html</code>. Usa el mismo manifiesto y los volúmenes por defecto del juego.</p>
+  <button id="todos">▶ Reproducir todos en orden</button>
+  <div id="lista"></div>
+</main>
+<script type="module" src="./probar-sonidos.ts"></script>
+</body>
+</html>
